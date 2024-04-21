@@ -1,8 +1,11 @@
+import 'dart:io';
+import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 void main() {
+
   runApp(MyApp());
 }
 
@@ -28,12 +31,15 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _speechEnabled = false;
   String _lastWords = '';
   bool _isListening = false;
+  late GenerativeModel _model;
+  late ChatSession _chat;
 
   @override
   void initState() {
     super.initState();
     print('Initializing speech...');
     _initSpeech();
+    _initModel();
   }
 
   /// This has to happen only once per app
@@ -44,6 +50,22 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
+  void _initModel() {
+    const apiKey = bool.hasEnvironment('API_KEY') ? String.fromEnvironment('API_KEY', defaultValue: 'NO_KEY') : null;
+    if (apiKey == null) {
+      print('No \$API_KEY environment variable');
+      exit(1);
+    }
+    _model = GenerativeModel(
+    model: 'gemini-pro',
+    apiKey: apiKey,
+    generationConfig: GenerationConfig(maxOutputTokens: 200));
+
+    _chat = _model.startChat(history: [
+        Content.text('Hello, I am going to have a conversation with a friend who is around my age in Spanish. You are going to receive a transcription as the conversation goes and help me communicate with this stranger. Please include no additional comments in your replies.'),
+      Content.model([TextPart('Great to meet you.')])
+    ]);
+  }
   /// Each time to start a speech recognition session
   void _startListening() async {
     print('Starting listening...');
