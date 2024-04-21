@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'googletranslateapi.dart';
+import 'dart:convert';
 
 void main() {
   runApp(MyApp());
@@ -33,8 +34,6 @@ class _MyHomePageState extends State<MyHomePage> {
   String _toDisplay = '';
   String _textInput = '';
   bool _isListening = false;
-  late GenerativeModel _model;
-  late ChatSession _chat;
   TextEditingController _textController = TextEditingController();
 
   @override
@@ -42,7 +41,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     print('Initializing speech...');
     _initSpeech();
-    _initModel();
   }
 
   /// This has to happen only once per app
@@ -51,26 +49,6 @@ class _MyHomePageState extends State<MyHomePage> {
     _speechEnabled = await _speechToText.initialize();
     print('Speech initialized: $_speechEnabled');
     setState(() {});
-  }
-
-  void _initModel() {
-    const apiKey = bool.hasEnvironment('API_KEY')
-        ? String.fromEnvironment('API_KEY', defaultValue: 'NO_KEY')
-        : null;
-    if (apiKey == null) {
-      print('No \$API_KEY environment variable');
-      exit(1);
-    }
-    _model = GenerativeModel(
-        model: 'gemini-pro',
-        apiKey: apiKey,
-        generationConfig: GenerationConfig(maxOutputTokens: 200));
-
-    _chat = _model.startChat(history: [
-      Content.text(
-          'Hello, I am going to have a conversation with a friend who is around my age in Spanish. You are going to receive a transcription as the conversation goes and help me communicate with this stranger. Please include no additional comments in your replies.'),
-      Content.model([TextPart('Great to meet you.')])
-    ]);
   }
 
   /// Each time to start a speech recognition session
@@ -105,13 +83,6 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       final englishTranslation = "translation failed :(";
     }
-
-    // Navigate to the new page
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //       builder: (context) => ResultPage(lastWords: _lastWords)),
-    // );
   }
 
   /// This is the callback that the SpeechToText plugin calls when
@@ -131,7 +102,10 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ResultPage(lastWords: _toDisplay)),
+          builder: (context) => ResultPage(
+                lastWords: _toDisplay,
+                textInput: _textInput,
+              )),
     );
   }
 
@@ -212,10 +186,150 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class ResultPage extends StatelessWidget {
+class ResultPage extends StatefulWidget {
   final String lastWords;
+  final String textInput;
 
-  const ResultPage({Key? key, required this.lastWords}) : super(key: key);
+  ResultPage({Key? key, required this.lastWords, required this.textInput})
+      : super(key: key);
+
+  @override
+  _ResultPageState createState() => _ResultPageState();
+}
+
+class _ResultPageState extends State<ResultPage> {
+  late String _displayedText;
+  late String _textInput;
+
+  late GenerativeModel _model;
+  late ChatSession _chat;
+
+  String response1 = 'Processing...';
+  String response2 = 'Processing...';
+  String response3 = 'Processing...';
+
+  Future<String> getresponse(
+      String context, ChatSession chat, String str) async {
+    var content;
+    var response;
+    content = Content.text(
+        'The friend tells me the following: "$context". I am going to respond to this message with this response: "$str" Please provide a list of three potential tone words to describe the tone of my response to my friend.');
+    await chat.sendMessage(content);
+
+    content = Content.text(
+        'Using the list of tone words you just generated, please translate my response into Spanish in those tones. Give your response as JSON in the format {"tone": tone, "translation": translation}, {"tone": tone, "translation": translation}, {"tone": tone, "translation": translation}. Be sure to separate each object with commas. Your response should start with a "{" and end with a "}".');
+    response = await chat.sendMessage(content);
+    return (response.text).toString();
+  }
+
+  // List<String> parseThree(String input) {
+  //   List<String> result = [];
+  //   List<String> lines = input.split('\n');
+
+  //   for (int i = 0; i < lines.length; i++) {
+  //     List<String> parts = lines[i].split(':');
+  //     result.add(
+  //         parts[0].trim().replaceAll('*', '')); // Add the word in asterisks
+
+  //     if (parts.length > 1) {
+  //       result.add(parts[1].trim()); // Add the rest of the sentence
+  //     } else {
+  //       if (i + 1 < lines.length) {
+  //         result.add(
+  //             lines[i + 1].trim()); // If there's no colon, add the next line
+  //       }
+  //     }
+  //   }
+  //   return result;
+  // }
+
+  @override
+  void initState() {
+    super.initState();
+    _initModel();
+    getResAndParse();
+  }
+
+  void getResAndParse() async {
+    _displayedText = widget.lastWords;
+    _textInput = widget.textInput;
+
+    print("pre everything");
+    print(_displayedText);
+    print(_textInput);
+    String res = await getresponse(_displayedText, _chat, _textInput);
+    print(res);
+    print("in getResAndParse");
+
+    // List<String> result = [];
+    // final regexp = RegExp('r\{([^}]+)\}');
+    // final matches = regexp.allMatches(res);
+    // for (Match match in matches) {
+    //   String json = match.group(1) ?? 'BEANS';
+    //   print(json);
+    //   result.add(json);
+    // }
+
+    // print(result);
+    // for (String json in result) {
+    //   final parsedJson = jsonDecode(json);
+    //   trans.add(parsedJson['tone']);
+    //   tones.add(parsedJson['translation']);
+    // }
+
+    List<Map<String, String>> listOfMaps = extractToneAndTranslation(res);
+
+    Map<String, String> first = listOfMaps[0];
+    Map<String, String> sec = listOfMaps[1];
+    Map<String, String> third = listOfMaps[2];
+
+    setState(() {
+      response1 = first.values.elementAt(1);
+      response2 = sec.values.elementAt(1);
+      response3 = third.values.elementAt(1);
+    });
+  }
+
+  List<Map<String, String>> extractToneAndTranslation(String input) {
+    List<Map<String, String>> result = [];
+    List<String> elements = input.split(RegExp(r'},\s*{'));
+
+    for (var element in elements) {
+      if (!element.startsWith('{')) {
+        element = '{' + element;
+      }
+      if (!element.endsWith('}')) {
+        element = element + '}';
+      }
+      Map<String, dynamic> obj = jsonDecode(element);
+      result.add({
+        'tone': obj['tone'],
+        'translation': obj['translation'],
+      });
+    }
+
+    return result;
+  }
+
+  void _initModel() {
+    const apiKey = bool.hasEnvironment('API_KEY')
+        ? String.fromEnvironment('API_KEY', defaultValue: 'NO_KEY')
+        : null;
+    if (apiKey == null) {
+      print('No \$API_KEY environment variable');
+      exit(1);
+    }
+    _model = GenerativeModel(
+        model: 'gemini-pro',
+        apiKey: apiKey,
+        generationConfig: GenerationConfig(maxOutputTokens: 200));
+
+    _chat = _model.startChat(history: [
+      Content.text(
+          'Hello, I am going to have a conversation with a friend who is around my age in Spanish. You are going to receive a transcription as the conversation goes and help me communicate with this stranger. Please include no additional comments in your replies.'),
+      Content.model([TextPart('Great to meet you.')])
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,35 +343,26 @@ class ResultPage extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(16),
             child: Text(
-              lastWords,
+              _displayedText,
               style: TextStyle(fontSize: 20.0),
             ),
           ),
-          // Expanded(
-          //   child: Container(
-          //     padding: EdgeInsets.all(16),
-          //     child: Text(
-          //       lastWords,
-          //       style: TextStyle(fontSize: 20.0),
-          //       textAlign: TextAlign.center,
-          //     ),
-          //   ),
-          // ),
           SizedBox(height: 20),
           Center(
-              child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(
-                        context); // Navigate back to the previous page
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red, // Change button color to red
-                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-                  ),
-                  child: Text(
-                    'Speak Again',
-                    style: TextStyle(fontSize: 18),
-                  ))),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Navigate back to the previous page
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red, // Change button color to red
+                padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+              ),
+              child: Text(
+                'Speak Again',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
           SizedBox(height: 300),
           Padding(
             padding:
@@ -276,7 +381,7 @@ class ResultPage extends StatelessWidget {
                           EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                     ),
                     child: Text(
-                      'This is a placeholder button. It may contain longer text.',
+                      response1,
                       style: TextStyle(fontSize: 18),
                       textAlign: TextAlign.center,
                     ),
@@ -294,7 +399,7 @@ class ResultPage extends StatelessWidget {
                           EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                     ),
                     child: Text(
-                      'This is a placeholder button. It may contain longer text.',
+                      response2,
                       style: TextStyle(fontSize: 18),
                       textAlign: TextAlign.center,
                     ),
@@ -312,7 +417,7 @@ class ResultPage extends StatelessWidget {
                           EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                     ),
                     child: Text(
-                      'This is a placeholder button. It may contain longer text.',
+                      response3,
                       style: TextStyle(fontSize: 18),
                       textAlign: TextAlign.center,
                     ),
