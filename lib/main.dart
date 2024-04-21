@@ -5,6 +5,7 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'googletranslateapi.dart';
 import 'dart:convert';
+import 'package:flutter_tts/flutter_tts.dart';
 
 void main() {
   runApp(MyApp());
@@ -198,6 +199,7 @@ class ResultPage extends StatefulWidget {
 }
 
 class _ResultPageState extends State<ResultPage> {
+  FlutterTts flutterTts = FlutterTts();
   late String _displayedText;
   late String _textInput;
 
@@ -228,6 +230,13 @@ class _ResultPageState extends State<ResultPage> {
         'Using the list of tone words you just generated, please translate my response into Spanish in those tones. Give your response as JSON in the format {"tone": tone, "translation": translation}, {"tone": tone, "translation": translation}, {"tone": tone, "translation": translation}. Be sure to separate each object with commas. Your response should start with a "{" and end with a "}".');
     response = await chat.sendMessage(content);
     return (response.text).toString();
+  }
+
+    Future<void> _speakSpanishSentence(String input) async {
+    await flutterTts.setLanguage('es-ES'); // Set language to Spanish (Spain)
+    await flutterTts.setPitch(1.0); // Set pitch (optional)
+    await flutterTts.setSpeechRate(1.0); // Set speech rate (optional)
+    await flutterTts.speak(input); // Spanish sentence to speak
   }
 
   // List<String> parseThree(String input) {
@@ -400,6 +409,7 @@ class _ResultPageState extends State<ResultPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       // Do something when Placeholder1 button is pressed
+                      _speakSpanishSentence(response1);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
@@ -425,6 +435,7 @@ class _ResultPageState extends State<ResultPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       // Do something when Placeholder2 button is pressed
+                      _speakSpanishSentence(response2);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
@@ -450,6 +461,7 @@ class _ResultPageState extends State<ResultPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       // Do something when Placeholder3 button is pressed
+                      _speakSpanishSentence(response3);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
