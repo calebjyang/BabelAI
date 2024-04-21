@@ -157,6 +157,22 @@ class ResultPage extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20),
+          Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Navigate back to the previous page
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red, // Change button color to red
+                      padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                    ),
+                    child: Text(
+                      'Speak Again',
+                      style: TextStyle(fontSize: 18),
+                    )
+                  )
+                ),
+          SizedBox(height: 300),
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
@@ -216,6 +232,7 @@ class ResultPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                SizedBox(height: 20),
               ],
             ),
           ),
