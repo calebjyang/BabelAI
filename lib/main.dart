@@ -209,7 +209,7 @@ class _ResultPageState extends State<ResultPage> {
   String response1 = 'Processing...';
   String response2 = 'Processing...';
   String response3 = 'Processing...';
-  
+
   String eng1 = 'Processing...';
   String eng2 = 'Processing...';
   String eng3 = 'Processing...';
@@ -322,7 +322,7 @@ class _ResultPageState extends State<ResultPage> {
       eng1 = t1;
       eng2 = t2;
       eng3 = t3;
-    });    
+    });
   }
 
   List<Map<String, String>> extractToneAndTranslation(String input) {
@@ -424,13 +424,23 @@ class _ResultPageState extends State<ResultPage> {
                   ),
                 ),
                 Expanded(
-                    child: Text(
-                      eng1, // Output text for response 1
-                      style: TextStyle(fontSize: 18),
-                      textAlign: TextAlign.center,
-                    ),
+                  child: Text(
+                    eng1, // Output text for response 1
+                    style: TextStyle(fontSize: 18),
+                    textAlign: TextAlign.center,
                   ),
+                ),
                 SizedBox(width: 20),
+                Expanded(
+                  child: Text(
+                    tone1,
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.purple),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
@@ -450,12 +460,22 @@ class _ResultPageState extends State<ResultPage> {
                   ),
                 ),
                 Expanded(
-                    child: Text(
-                      eng2, // Output text for response 2
-                      style: TextStyle(fontSize: 18),
-                      textAlign: TextAlign.center,
-                    ),
+                  child: Text(
+                    eng2, // Output text for response 2
+                    style: TextStyle(fontSize: 18),
+                    textAlign: TextAlign.center,
                   ),
+                ),
+                Expanded(
+                  child: Text(
+                    tone2,
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.purple),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
                 SizedBox(width: 20),
                 Expanded(
                   child: ElevatedButton(
@@ -476,12 +496,22 @@ class _ResultPageState extends State<ResultPage> {
                   ),
                 ),
                 Expanded(
-                    child: Text(
-                      eng3, // Output text for response 3
-                      style: TextStyle(fontSize: 18),
-                      textAlign: TextAlign.center,
-                    ),
+                  child: Text(
+                    eng3, // Output text for response 3
+                    style: TextStyle(fontSize: 18),
+                    textAlign: TextAlign.center,
                   ),
+                ),
+                Expanded(
+                  child: Text(
+                    tone3,
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.purple),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
                 SizedBox(height: 20),
               ],
             ),
