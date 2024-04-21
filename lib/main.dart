@@ -187,7 +187,7 @@ class ResultPage extends StatelessWidget {
                       // Do something when Placeholder2 button is pressed
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.transparent,
+                      backgroundColor: Colors.transparent,
                       padding:
                           EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                     ),
@@ -205,7 +205,7 @@ class ResultPage extends StatelessWidget {
                       // Do something when Placeholder3 button is pressed
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.transparent,
+                      backgroundColor: Colors.transparent,
                       padding:
                           EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                     ),
