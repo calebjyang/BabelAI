@@ -388,15 +388,10 @@ class _ResultPageState extends State<ResultPage> {
                   ),
                 ),
                 Expanded(
-                    child: TextFormField(
-                      initialValue: '', // Initial value of the text box
-                      onChanged: (value) {
-                        // Handle text changes
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Response 1',
-                      ),
+                    child: Text(
+                      'Output Text 1', // Output text for response 1
+                      style: TextStyle(fontSize: 18),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 SizedBox(width: 20),
@@ -418,15 +413,10 @@ class _ResultPageState extends State<ResultPage> {
                   ),
                 ),
                 Expanded(
-                    child: TextFormField(
-                      initialValue: '', // Initial value of the text box
-                      onChanged: (value) {
-                        // Handle text changes
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Response 2',
-                      ),
+                    child: Text(
+                      'Output Text 2', // Output text for response 2
+                      style: TextStyle(fontSize: 18),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 SizedBox(width: 20),
@@ -448,15 +438,10 @@ class _ResultPageState extends State<ResultPage> {
                   ),
                 ),
                 Expanded(
-                    child: TextFormField(
-                      initialValue: '', // Initial value of the text box
-                      onChanged: (value) {
-                        // Handle text changes
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Response 3',
-                      ),
+                    child: Text(
+                      'Output Text 3', // Output text for response 3
+                      style: TextStyle(fontSize: 18),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 SizedBox(height: 20),
