@@ -212,6 +212,10 @@ class _ResultPageState extends State<ResultPage> {
   String eng2 = 'Processing...';
   String eng3 = 'Processing...';
 
+  String tone1 = '';
+  String tone2 = '';
+  String tone3 = '';
+
   Future<String> getresponse(
       String context, ChatSession chat, String str) async {
     var content;
@@ -291,6 +295,10 @@ class _ResultPageState extends State<ResultPage> {
       response1 = first.values.elementAt(1);
       response2 = sec.values.elementAt(1);
       response3 = third.values.elementAt(1);
+
+      tone1 = first.values.elementAt(0);
+      tone2 = sec.values.elementAt(0);
+      tone3 = third.values.elementAt(0);
     });
     String t1 = '', t2 = '', t3 = '';
     try {
