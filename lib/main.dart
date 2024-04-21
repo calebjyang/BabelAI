@@ -119,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _isListening ? _stopListening : _startListening,
         tooltip: _isListening ? 'Stop Listening' : 'Listen',
-        child: Icon(_isListening ? Icons.mic_off : Icons.mic),
+        child: Icon(_isListening ? Icons.mic : Icons.mic_off),
       ),
     );
   }
