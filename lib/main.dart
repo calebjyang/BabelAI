@@ -387,6 +387,18 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                   ),
                 ),
+                Expanded(
+                    child: TextFormField(
+                      initialValue: '', // Initial value of the text box
+                      onChanged: (value) {
+                        // Handle text changes
+                      },
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Response 1',
+                      ),
+                    ),
+                  ),
                 SizedBox(width: 20),
                 Expanded(
                   child: ElevatedButton(
@@ -405,6 +417,18 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                   ),
                 ),
+                Expanded(
+                    child: TextFormField(
+                      initialValue: '', // Initial value of the text box
+                      onChanged: (value) {
+                        // Handle text changes
+                      },
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Response 2',
+                      ),
+                    ),
+                  ),
                 SizedBox(width: 20),
                 Expanded(
                   child: ElevatedButton(
@@ -423,6 +447,18 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                   ),
                 ),
+                Expanded(
+                    child: TextFormField(
+                      initialValue: '', // Initial value of the text box
+                      onChanged: (value) {
+                        // Handle text changes
+                      },
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Response 3',
+                      ),
+                    ),
+                  ),
                 SizedBox(height: 20),
               ],
             ),
