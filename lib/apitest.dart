@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
@@ -30,15 +31,27 @@ void main() async {
   response = await chat.sendMessage(content);
   print(response.text);
 
-  content = Content.text('The friend says the following line. Please translate the following message from Mexican Spanish to English: "Me alegro por ti! Pero que paso con el otro trabajo?"');
-  response = await chat.sendMessage(content);
-  print(response.text);
+  // content = Content.text('The friend says the following line. Please translate the following message from Mexican Spanish to English: "Me alegro por ti! Pero que paso con el otro trabajo?"');
+  // response = await chat.sendMessage(content);
+  // print(response.text);
+  String context = "Me alegro por ti! Pero que paso con el otro trabajo?";
+  String str = "Because of COVID, the company was forced to downsize. In order to avoid going under, the company fired me any many others.";
+  String stringvalue = await getresponse(context, chat, str);
+  print(stringvalue);
 
-  content = Content.text('I am going to respond to this message with this response: "Because of COVID, the company was forced to downsize. In order to avoid going under, the company fired me any many others." Please provide a list of three potential tone words to describe the tone of my response to my friend.');
-  response = await chat.sendMessage(content);
-  print(response.text);
+}
+
+Future<String> getresponse(String context, ChatSession chat, String str) async
+{
+  var content;
+  var response;
+  content = Content.text('The friend tells me the following: "$context"');
+  await chat.sendMessage(content);
+
+  content = Content.text('I am going to respond to this message with this response: "$str" Please provide a list of three potential tone words to describe the tone of my response to my friend.');
+  await chat.sendMessage(content);
 
   content = Content.text('Using the list of tone words you just generated, please translate my response into Spanish in those tones');
   response = await chat.sendMessage(content);
-  print(response.text);
+  return (response.text).toString(); 
 }
