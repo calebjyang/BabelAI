@@ -2,7 +2,6 @@ import 'package:googleapis/translate/v3.dart';
 import 'package:googleapis_auth/auth_io.dart';
 
 Future<String> translateText(String text) async {
-  // Load the JSON key file containing your GCP credentials
   var credentials = ServiceAccountCredentials.fromJson({
     "private_key_id": "ea2e05f4c2f60611fa53790358a20cd4b88f2558",
     "private_key":
@@ -12,18 +11,15 @@ Future<String> translateText(String text) async {
     "type": "service_account"
   });
 
-  // Initialize the translation client
   var client = GoogleTranslateV3(
     await clientViaServiceAccount(
         credentials, [TranslateApi.CloudTranslationScope]),
   );
 
-  // Translate the text
   var translation = await client.translations.translate(
     text,
     to: 'es', 
   );
 
-  // Return the translated text
   return translation.translatedText;
 }
