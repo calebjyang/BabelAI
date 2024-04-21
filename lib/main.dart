@@ -169,7 +169,7 @@ class ResultPage extends StatelessWidget {
                       // Do something when Placeholder1 button is pressed
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.transparent,
+                      backgroundColor: Colors.transparent,
                       padding:
                           EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                     ),
