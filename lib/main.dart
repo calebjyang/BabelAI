@@ -3,9 +3,9 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'googletranslateapi.dart';
 
 void main() {
-
   runApp(MyApp());
 }
 
@@ -30,6 +30,7 @@ class _MyHomePageState extends State<MyHomePage> {
   SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   String _lastWords = '';
+  String _toDisplay = '';
   bool _isListening = false;
   late GenerativeModel _model;
   late ChatSession _chat;
@@ -51,21 +52,25 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _initModel() {
-    const apiKey = bool.hasEnvironment('API_KEY') ? String.fromEnvironment('API_KEY', defaultValue: 'NO_KEY') : null;
+    const apiKey = bool.hasEnvironment('API_KEY')
+        ? String.fromEnvironment('API_KEY', defaultValue: 'NO_KEY')
+        : null;
     if (apiKey == null) {
       print('No \$API_KEY environment variable');
       exit(1);
     }
     _model = GenerativeModel(
-    model: 'gemini-pro',
-    apiKey: apiKey,
-    generationConfig: GenerationConfig(maxOutputTokens: 200));
+        model: 'gemini-pro',
+        apiKey: apiKey,
+        generationConfig: GenerationConfig(maxOutputTokens: 200));
 
     _chat = _model.startChat(history: [
-        Content.text('Hello, I am going to have a conversation with a friend who is around my age in Spanish. You are going to receive a transcription as the conversation goes and help me communicate with this stranger. Please include no additional comments in your replies.'),
+      Content.text(
+          'Hello, I am going to have a conversation with a friend who is around my age in Spanish. You are going to receive a transcription as the conversation goes and help me communicate with this stranger. Please include no additional comments in your replies.'),
       Content.model([TextPart('Great to meet you.')])
     ]);
   }
+
   /// Each time to start a speech recognition session
   void _startListening() async {
     print('Starting listening...');
@@ -86,16 +91,25 @@ class _MyHomePageState extends State<MyHomePage> {
   void _stopListening() async {
     print('Stopping listening...');
     await _speechToText.stop();
-    setState(() {
-      _isListening = false;
-    });
+
+    try {
+      final englishTranslation = await TranslationService.translate(_lastWords);
+      _lastWords = englishTranslation;
+      _toDisplay = _lastWords;
+      setState(() {
+        _isListening = false;
+        print('here');
+      });
+    } catch (e) {
+      final englishTranslation = "translation failed :(";
+    }
 
     // Navigate to the new page
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => ResultPage(lastWords: _lastWords)),
-    );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //       builder: (context) => ResultPage(lastWords: _lastWords)),
+    // );
   }
 
   /// This is the callback that the SpeechToText plugin calls when
@@ -103,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
       _lastWords = result.recognizedWords;
-      print('Recognized words: $_lastWords');
+      // print('Recognized words: $_lastWords');
     });
   }
 
@@ -128,8 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Container(
                 padding: EdgeInsets.all(16),
                 child: Text(
-                  // If listening is active show the recognized words
-                  !_isListening ? _lastWords : '',
+                  !_isListening ? _toDisplay : '',
                   style: TextStyle(fontSize: 20.0),
                   textAlign: TextAlign.center,
                 ),
@@ -164,36 +177,35 @@ class ResultPage extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(16),
             child: Text(
-              'Recognized words:',
+              lastWords,
               style: TextStyle(fontSize: 20.0),
             ),
           ),
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                lastWords,
-                style: TextStyle(fontSize: 20.0),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
+          // Expanded(
+          //   child: Container(
+          //     padding: EdgeInsets.all(16),
+          //     child: Text(
+          //       lastWords,
+          //       style: TextStyle(fontSize: 20.0),
+          //       textAlign: TextAlign.center,
+          //     ),
+          //   ),
+          // ),
           SizedBox(height: 20),
           Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Navigate back to the previous page
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red, // Change button color to red
-                      padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-                    ),
-                    child: Text(
-                      'Speak Again',
-                      style: TextStyle(fontSize: 18),
-                    )
-                  )
-                ),
+              child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(
+                        context); // Navigate back to the previous page
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red, // Change button color to red
+                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                  ),
+                  child: Text(
+                    'Speak Again',
+                    style: TextStyle(fontSize: 18),
+                  ))),
           SizedBox(height: 300),
           Padding(
             padding:
