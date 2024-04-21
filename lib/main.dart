@@ -31,9 +31,11 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _speechEnabled = false;
   String _lastWords = '';
   String _toDisplay = '';
+  String _textInput = '';
   bool _isListening = false;
   late GenerativeModel _model;
   late ChatSession _chat;
+  TextEditingController _textController = TextEditingController();
 
   @override
   void initState() {
@@ -121,11 +123,23 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _submitText() {
+    setState(() {
+      _textInput = _textController.text;
+    });
+    // Navigate to the new page
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ResultPage(lastWords: _toDisplay)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Speech Demo'),
+        title: Text('BabelAI'),
       ),
       body: Center(
         child: Column(
@@ -148,14 +162,52 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: FloatingActionButton(
+                        onPressed:
+                            _isListening ? _stopListening : _startListening,
+                        tooltip: _isListening ? 'Stop Listening' : 'Listen',
+                        child: Icon(_isListening ? Icons.mic : Icons.mic_off),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 6,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: TextFormField(
+                        controller: _textController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Enter Text',
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: ElevatedButton(
+                        onPressed: _submitText,
+                        child: Icon(Icons.arrow_upward),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _isListening ? _stopListening : _startListening,
-        tooltip: _isListening ? 'Stop Listening' : 'Listen',
-        child: Icon(_isListening ? Icons.mic : Icons.mic_off),
-      ),
+      floatingActionButton: SizedBox.shrink(),
     );
   }
 }
