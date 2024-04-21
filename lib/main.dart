@@ -207,6 +207,10 @@ class _ResultPageState extends State<ResultPage> {
   String response1 = 'Processing...';
   String response2 = 'Processing...';
   String response3 = 'Processing...';
+  
+  String eng1 = 'Processing...';
+  String eng2 = 'Processing...';
+  String eng3 = 'Processing...';
 
   Future<String> getresponse(
       String context, ChatSession chat, String str) async {
@@ -288,6 +292,20 @@ class _ResultPageState extends State<ResultPage> {
       response2 = sec.values.elementAt(1);
       response3 = third.values.elementAt(1);
     });
+    String t1 = '', t2 = '', t3 = '';
+    try {
+      t1 = await TranslationService.translate(response1);
+      t2 = await TranslationService.translate(response2);
+      t3 = await TranslationService.translate(response3);
+    } catch (e) {
+      final englishTranslation = "translation failed :(";
+    }
+
+    setState(() {
+      eng1 = t1;
+      eng2 = t2;
+      eng3 = t3;
+    });    
   }
 
   List<Map<String, String>> extractToneAndTranslation(String input) {
@@ -389,7 +407,7 @@ class _ResultPageState extends State<ResultPage> {
                 ),
                 Expanded(
                     child: Text(
-                      'Output Text 1', // Output text for response 1
+                      eng1, // Output text for response 1
                       style: TextStyle(fontSize: 18),
                       textAlign: TextAlign.center,
                     ),
@@ -414,7 +432,7 @@ class _ResultPageState extends State<ResultPage> {
                 ),
                 Expanded(
                     child: Text(
-                      'Output Text 2', // Output text for response 2
+                      eng2, // Output text for response 2
                       style: TextStyle(fontSize: 18),
                       textAlign: TextAlign.center,
                     ),
@@ -439,7 +457,7 @@ class _ResultPageState extends State<ResultPage> {
                 ),
                 Expanded(
                     child: Text(
-                      'Output Text 3', // Output text for response 3
+                      eng3, // Output text for response 3
                       style: TextStyle(fontSize: 18),
                       textAlign: TextAlign.center,
                     ),
